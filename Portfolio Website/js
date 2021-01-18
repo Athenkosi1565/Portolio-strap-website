@@ -1,0 +1,195 @@
+(function ($) {
+	"use strict";
+	var nav = $('nav');
+  var navHeight = nav.outerHeight();
+  
+  $('.navbar-toggler').on('click', function() {
+    if( ! $('#mainNav').hasClass('navbar-reduce')) {
+      $('#mainNav').addClass('navbar-reduce');
+    }
+  })
+
+  // Preloader
+  $(window).on('load', function () {
+    if ($('#preloader').length) {
+      $('#preloader').delay(100).fadeOut('slow', function () {
+        $(this).remove();
+      });
+    }
+  });
+
+  // Back to top button
+  $(window).scroll(function() {
+    if ($(this).scrollTop() > 100) {
+      $('.back-to-top').fadeIn('slow');
+    } else {
+      $('.back-to-top').fadeOut('slow');
+    }
+  });
+  $('.back-to-top').click(function(){
+    $('html, body').animate({scrollTop : 0},1500, 'easeInOutExpo');
+    return false;
+  });
+
+	/*--/ Star ScrollTop /--*/
+	$('.scrolltop-mf').on("click", function () {
+		$('html, body').animate({
+			scrollTop: 0
+		}, 1000);
+	});
+
+	// /*--/ Star Counter /--*/
+	// $('.counter').counterUp({
+	// 	delay: 15,
+	// 	time: 2000
+	// });
+
+	/*--/ Star Scrolling nav /--*/
+	$('a.js-scroll[href*="#"]:not([href="#"])').on("click", function () {
+		if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+			var target = $(this.hash);
+			target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+			if (target.length) {
+				$('html, body').animate({
+					scrollTop: (target.offset().top - navHeight + 5)
+				}, 1000, "easeInOutExpo");
+				return false;
+			}
+		}
+	});
+
+	// Closes responsive menu when a scroll trigger link is clicked
+	$('.js-scroll').on("click", function () {
+		$('.navbar-collapse').collapse('hide');
+	});
+
+	// Activate scrollspy to add active class to navbar items on scroll
+	$('body').scrollspy({
+		target: '#mainNav',
+		offset: navHeight
+	});
+	/*--/ End Scrolling nav /--*/
+
+	/*--/ Navbar Menu Reduce /--*/
+	$(window).trigger('scroll');
+	$(window).on('scroll', function () {
+		var pixels = 50; 
+		var top = 1200;
+		if ($(window).scrollTop() > pixels) {
+			$('.navbar-expand-md').addClass('navbar-reduce');
+			$('.navbar-expand-md').removeClass('navbar-trans');
+		} else {
+			$('.navbar-expand-md').addClass('navbar-trans');
+			$('.navbar-expand-md').removeClass('navbar-reduce');
+		}
+		if ($(window).scrollTop() > top) {
+			$('.scrolltop-mf').fadeIn(1000, "easeInOutExpo");
+		} else {
+			$('.scrolltop-mf').fadeOut(1000, "easeInOutExpo");
+		}
+	});
+
+	$(function () { 
+		$(window).scroll(function () {
+			if ($(this).scrollTop() > 58) { 
+				$('.navbar-brand-img img').attr('src','img/dm-logo-blue.svg');
+			}
+			if ($(this).scrollTop() < 58) { 
+				$('.navbar-brand-img img').attr('src','img/dm-logo-white.svg');
+			}
+		})
+	});
+
+
+
+// ------Firebase------//
+var config = {
+	apiKey: "AIzaSyDgriAkUqTrUZ3BpxV7qys2-WpdccTJ4-M",
+    authDomain: "portfolio-strap-website.firebaseapp.com",
+    databaseURL: "https://portfolio-strap-website.firebaseio.com",
+    projectId: "portfolio-strap-website",
+    storageBucket: "portfolio-strap-website.appspot.com",
+    messagingSenderId: "72652023088",
+    appId: "1:72652023088:web:def505d7edeb79eb24d4f5",
+    measurementId: "G-5VC37CHMQD"
+};
+
+firebase.initializeApp(config);
+
+// Reference messages collection
+var database = firebase.database();
+var messagesRef = database.ref("messages");
+
+// Listen to form submit
+document.getElementById("contactForm").addEventListener("submit", submitForm);
+
+// Submit form
+function submitForm(e) {
+	e.preventDefault();
+
+	// Get values
+	var name = getInputVal("name");
+	var email = getInputVal("email");
+	var tel = getInputVal("tel");
+	var message = getInputVal("message");
+
+
+	// Save message
+	saveMessage(name, email, tel, message);
+
+	// Show alert
+	document.querySelector("#sendmessage").style.display = "block";
+
+	setTimeout(function () {
+		document.querySelector("#sendmessage").style.display = "none";
+	}, 4000);
+
+	// Clear form
+	document.getElementById("contactForm").reset();
+}
+
+function getInputVal(id) {
+	return document.getElementById(id).value;
+}
+
+// Save message to firebase
+function saveMessage(name, email, tel, message) {
+	var newMessageRef = messagesRef.push();
+	newMessageRef.set({
+		name: name,
+		email: email,
+		tel: tel,
+		message: message
+	});
+}
+
+// recaptcha styling //
+
+$(function(){
+  function rescaleCaptcha(){
+    var width = $('.g-recaptcha').parent().width();
+    var scale;
+    if (width < 302) {
+      scale = width / 302;
+    } else{
+      scale = 1.0; 
+    }
+
+    $('.g-recaptcha').css('transform', 'scale(' + scale + ')');
+    $('.g-recaptcha').css('-webkit-transform', 'scale(' + scale + ')');
+    $('.g-recaptcha').css('transform-origin', '0 0');
+    $('.g-recaptcha').css('-webkit-transform-origin', '0 0');
+  }
+
+  rescaleCaptcha();
+  $( window ).resize(function() { rescaleCaptcha(); });
+
+});
+
+// ---recaptcha callback---
+var correctCaptcha = function(response) {
+	alert(response);
+};
+
+})(jQuery);
+
